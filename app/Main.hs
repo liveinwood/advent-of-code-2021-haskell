@@ -1,8 +1,10 @@
 module Main where
 
 import Day1
+import Day2
 
 main :: IO ()
 main = do
-  l <- fmap (read :: String -> Int) . lines <$> getContents
-  print $ solve2 l
+  ins <- fmap parseInstruction . lines <$> getContents
+  let (_, SubmarineState (h, d)) = runState (Day2.solve ins) (SubmarineState (0, 0))
+  print (h * d)

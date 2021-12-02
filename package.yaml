@@ -24,6 +24,9 @@ dependencies:
 
 library:
   source-dirs: src
+  dependencies:
+    - mtl
+    - transformers
 
 executables:
   advent-of-code-exe:
