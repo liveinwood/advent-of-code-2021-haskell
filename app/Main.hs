@@ -5,4 +5,4 @@ import Day2
 import Day3
 
 main :: IO ()
-main = Day3.solve
+main = Day3.solve'
