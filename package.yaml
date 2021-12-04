@@ -27,6 +27,7 @@ library:
   dependencies:
     - mtl
     - transformers
+    - vector
 
 executables:
   advent-of-code-exe:

@@ -1,23 +1,24 @@
 module Day3 where
 
 import Data.Char (digitToInt)
+import Data.Vector as V
 
-toList :: String -> [Int]
-toList = fmap digitToInt
+toVector :: String -> Vector Int
+toVector s = fromList $ fmap digitToInt s
 
-makeEmptyList :: Int -> [Int]
-makeEmptyList n = replicate n 0
+makeEmptyVector :: Int -> Vector Int
+makeEmptyVector n = V.replicate n 0
 
-add :: [Int] -> [Int] -> [Int]
-add = zipWith (\x y -> if y == 1 then x + 1 else x -1)
+add :: Vector Int -> Vector Int -> Vector Int
+add = V.zipWith (\x y -> if y == 1 then x + 1 else x -1)
 
-toDecimal :: [Int] -> Int
-toDecimal xs = sum $ zipWith (*) (iterate (* 2) 1) (reverse xs)
+toDecimal :: Vector Int -> Int
+toDecimal xs = V.sum $ V.zipWith (*) (V.iterateN (V.length xs) (* 2) 1) (V.reverse xs)
 
 solve :: IO ()
 solve = do
-  lists <- fmap toList . lines <$> getContents
-  let empty = makeEmptyList . (length . head) $ lists
-  let gamma = (\x -> if x >= 0 then 1 else 0) <$> foldl add empty lists
-  let epsilon = (\x -> if x < 0 then 1 else 0) <$> foldl add empty lists
+  lists <- V.fromList . fmap toVector . lines <$> getContents
+  let empty = makeEmptyVector . (V.length . V.head) $ lists
+  let gamma = (\x -> if x >= 0 then 1 else 0) <$> V.foldl add empty lists
+  let epsilon = (\x -> if x < 0 then 1 else 0) <$> V.foldl add empty lists
   print $ toDecimal gamma * toDecimal epsilon
