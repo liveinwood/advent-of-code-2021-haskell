@@ -29,6 +29,7 @@ library:
     - transformers
     - vector
     - split
+    - containers
 
 
 executables:
