@@ -28,6 +28,8 @@ library:
     - mtl
     - transformers
     - vector
+    - split
+
 
 executables:
   advent-of-code-exe:
