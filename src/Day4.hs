@@ -44,3 +44,19 @@ go (n : ns) bs =
   let nextBoards = Prelude.map (mark n) bs
       winBoards = Prelude.filter win nextBoards
    in if Prelude.null winBoards then go ns nextBoards else (n, winBoards)
+
+-- part 2
+solve' = do
+  lines <- Prelude.filter (/= "") . lines <$> getContents
+  let drawNumbers = (read :: String -> Int) <$> splitOn "," (Prelude.head lines)
+  let boards = makeBoards $ Prelude.tail lines
+  let (winNumber, winBoards) = go' drawNumbers boards
+  print $ winNumber * (Prelude.maximum . (Prelude.map score) $ winBoards)
+
+go' :: [Int] -> [Board] -> (Int, [Board])
+go' [] bs = error "never reach here"
+go' (n : ns) bs =
+  let nextBoards = Prelude.map (mark n) bs
+      winBoards = Prelude.filter win nextBoards
+      notWinBoards = Prelude.filter (not . win) nextBoards
+   in if Prelude.null winBoards then go' ns nextBoards else (if Prelude.null notWinBoards then (n, winBoards) else go' ns notWinBoards)
