@@ -2,8 +2,9 @@ module Day5 where
 
 import Data.List.Split
 import Data.Map as M
+import Data.Maybe
 
-data P = P {_x :: Int, _y :: Int} deriving (Show)
+data P = P {_x :: Int, _y :: Int} deriving (Show, Eq, Ord)
 
 makePoint :: String -> P
 makePoint s =
@@ -25,11 +26,18 @@ pointsOnLine p q
 splitOnArrow :: String -> (String, String)
 splitOnArrow s = let [p, q] = splitOn " -> " s in (p, q)
 
+makePoints :: [(String, String)] -> [P]
+makePoints spairs = do
+  (p1, p2) <- (\pair -> (makePoint $ fst pair, makePoint $ snd pair)) <$> spairs
+  if isVertical p1 p2 || isHorizontal p1 p2 then pointsOnLine p1 p2 else []
+
 solve = do
   pairs <- fmap splitOnArrow . lines <$> getContents
-  let points = fmap (\pair -> (makePoint $ fst pair, makePoint $ snd pair)) pairs
-  print points
+  let points = makePoints pairs
+  let m = Prelude.filter (\(_, c) -> c > 1) (M.toList . go $ points)
+  print $ length m
 
-go :: [(P, P)] -> M.Map P Int -> M.Map P Int
-go [] m = m
-go (pair:pairs) m = if (isHorizontal (fst pair) (snd pair)) || (isVertical (fst pair) (snd pair)) then 
+go :: [P] -> M.Map P Int
+go = Prelude.foldl f M.empty
+  where
+    f m p = let c = fromMaybe 0 (M.lookup p m) in M.insert p (c + 1) m
