@@ -11,4 +11,4 @@ import Day7
 import Day8
 
 main :: IO ()
-main = Day10.solve
+main = Day10.solve'
