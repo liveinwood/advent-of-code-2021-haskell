@@ -113,3 +113,13 @@ toIntList :: ByteString -> [Int]
 toIntList s = if BS.null s then [] else case BS.readInt (BS.take 1 s) of
                                         Just (n, _) -> n : toIntList (BS.tail s)
                                         Nothing -> []
+
+-------------------------------------- part 2 -----------------------------------------------------------
+
+-- 全座標がフラッシュしたか
+allFlash :: Grid -> Bool
+allFlash g = flashCount g == (gridSize g + 1) * (gridSize g + 1)
+
+
+solve2 :: Int -> Grid -> Int
+solve2 cnt !g = if allFlash g then cnt else solve2 (cnt + 1) (snd (step (0, g)))
