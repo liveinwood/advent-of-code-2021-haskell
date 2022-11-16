@@ -5,7 +5,7 @@ import           Control.Monad            (forM_, guard)
 import           Data.ByteString          (ByteString)
 import qualified Data.ByteString.Char8    as BS
 import           Data.Char                (isUpper)
-import           Data.List                (unfoldr)
+import           Data.List                (group, sort, unfoldr)
 import qualified Data.Map                 as M
 import           Data.Maybe               (fromMaybe)
 import           Data.Vector.Unboxed.Base (Vector (V_Bool))
@@ -53,3 +53,38 @@ makeGraph = do
 solve = do
     graph <- makeGraph
     print $ dfs graph [] Start
+
+
+
+------------------------------ part 2 ---------------------------
+type Visited = M.Map Cave Int
+
+initVisted :: [Cave] -> Visited
+initVisted cs = M.fromList $ zip cs (repeat 0)
+
+
+dfs' :: Graph -> Path -> Int
+dfs' graph path = if validPath path then go graph path else 0
+    where
+        validPath :: Path -> Bool
+        validPath path = let
+                            smallCaves = sort $ filter isSmallCave path
+                         in
+                            null smallCaves || (all (\cs -> length cs <= 2) (group smallCaves) && (length ( filter (\cs -> length cs == 2) (group smallCaves)) <= 1 ))
+
+
+        go :: Graph -> Path -> Int
+        go graph path = if head path == End then 1 else foldl (\x c -> x + dfs' graph (c:path)) 0 nextCaves
+
+        nextCaves :: [Cave]
+        nextCaves = filter (not . isStart) $ fromMaybe [] (M.lookup (head path) graph)
+
+        isSmallCave :: Cave -> Bool
+        isSmallCave (Small _) = True
+        isSmallCave _         = False
+
+        isStart Start = True
+        isStart _     = False
+solve' = do
+    graph <- makeGraph
+    print $ dfs' graph [Start]
