@@ -1,9 +1,46 @@
-module Day13 (foldLeft2dVAt, foldUp2dVAt, visibleDotCount, readInput, update2dVector, make2dVector) where
+{-# LANGUAGE OverloadedStrings #-}
+
+module Day13 (foldLeft2dVAt,
+              foldUp2dVAt,
+              visibleDotCount,
+              readInput,
+              update2dVector,
+              make2dVector,
+              print2dVector,
+              solve) where
 
 import qualified Data.ByteString.Char8 as BS
 import           Data.Maybe
 import           Data.Monoid
 import qualified Data.Vector           as V
+
+data Inst = FoldLeft Int | FoldUp Int
+
+decodeInst :: BS.ByteString -> Maybe Inst
+decodeInst s = do
+    let
+        [_, _, ins] = BS.words s
+        xy = BS.take 1 ins
+    (n, _) <- BS.readInt $ BS.drop 2 ins
+    case xy of
+        "x" -> Just $ FoldLeft n
+        "y" -> Just $ FoldUp n
+        _ -> error "decodeInst Error!"
+
+solve :: (Eq a, Monoid a) => [BS.ByteString] -> V.Vector (V.Vector a) -> IO ()
+solve [] vv = print2dVector vv
+solve (s:ss) vv = case decodeInst s of
+                    Just (FoldLeft x) -> solve ss (foldLeft2dVAt x vv)
+                    Just (FoldUp y) -> solve ss (foldUp2dVAt y vv)
+                    Nothing -> error "decodeInst Error!"
+
+
+print2dVector :: (Eq a, Monoid a) => V.Vector (V.Vector a) -> IO ()
+print2dVector vv = do
+    V.forM_ vv $ \v -> do
+        V.forM_ v $ \e -> do
+            putStr $ if e == mempty then "." else "#"
+        putStrLn ""
 
 
 make2dVector :: BS.ByteString -> V.Vector (V.Vector (Sum Int))
