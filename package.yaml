@@ -23,6 +23,7 @@ dependencies:
 - base >= 4.7 && < 5
 - containers
 - bytestring
+- vector
 
 library:
   source-dirs: src
@@ -55,3 +56,6 @@ tests:
     - -with-rtsopts=-N
     dependencies:
     - advent-of-code
+    - hspec
+    - QuickCheck
+    - vector
