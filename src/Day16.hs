@@ -24,6 +24,21 @@ data Packet = Literal Version TypeId [Value]
 newtype Parser a = Parser (BS.ByteString -> Maybe (a, BS.ByteString))
 
 
+eval :: Packet -> Int
+eval (Operator _ (TypeId "000") _ packets) = sum $ map eval packets
+eval (Operator _ (TypeId "001") _ packets) = product $ map eval packets
+eval (Operator _ (TypeId "010") _ packets) = minimum $ map eval packets
+eval (Operator _ (TypeId "011") _ packets) = maximum $ map eval packets
+eval (Operator _ (TypeId "101") _ [pkt1, pkt2]) = if eval pkt1 > eval pkt2 then 1 else 0
+eval (Operator _ (TypeId "110") _ [pkt1, pkt2]) = if eval pkt1 < eval pkt2 then 1 else 0
+eval (Operator _ (TypeId "111") _ [pkt1, pkt2]) = if eval pkt1 == eval pkt2 then 1 else 0
+eval (Literal _ _ values) = toInt $ BS.concat $ map helper values
+    where
+        helper (Value _ s) = s
+        helper (LastValue _ s) = s
+eval _ = error "eval error"
+
+
 sumVersion  :: Packet -> Int
 sumVersion pkt = sum $ map f $ collectVersion pkt
     where
